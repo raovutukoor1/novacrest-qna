@@ -15,8 +15,7 @@ HuggingFaceEmbeddings( \
 ENV TRANSFORMERS_OFFLINE=1
 ENV HF_HUB_OFFLINE=1
 
-# Explicitly reserve environment variables for execution
-ENV OPENAI_API_KEY=""
+# Configure the default endpoint; provide OPENAI_API_KEY at runtime.
 ENV OPENAI_API_BASE="https://api.openai.com/v1"
 ENV OPENAI_BASE_URL="https://api.openai.com/v1"
 
