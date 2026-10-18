@@ -1,5 +1,6 @@
 from langchain_openai import ChatOpenAI
 import os
+import sys
 
 def retrieve(query: str, k: int = 2, vectorstore=None) -> list[str]:
     results = vectorstore.similarity_search(query, k=k)
@@ -24,7 +25,7 @@ def generate(query, retrieved_chunks, model) -> str:
       retrieved documentation.
     2. Do not use outside knowledge, assumptions, or information that is not
       present in the retrieved documentation.
-    3. Answer the user's specific question directly and completely.
+    3. Answer the user\'s specific question directly and completely.
     4. When the documentation provides configuration steps, setup instructions,
       procedures, or troubleshooting steps, present them clearly and in the
       correct order.
@@ -42,14 +43,19 @@ def generate(query, retrieved_chunks, model) -> str:
     return model.invoke(prompt)
 
 def rag(query: str, k: int = 2, model_name: str = "gpt-4o-mini", temperature: float = 0.0, top_p: float = 1.0, max_tokens: int = 512, vectorstore=None):
-    # Support both conventional OpenAI endpoint names
+    # Obtain variables with fallbacks
     api_base = os.getenv('OPENAI_API_BASE') or os.getenv('OPENAI_BASE_URL') or 'https://api.openai.com/v1'
     api_key = os.getenv('OPENAI_API_KEY')
 
+    # Secure Diagnostics
+    print("[NovaCrest Diagnostic] Active API Base:", api_base, file=sys.stderr)
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set in the container environment.")
+        print("[NovaCrest Error] OPENAI_API_KEY environment variable is empty or missing inside the container!", file=sys.stderr)
+        raise ValueError("OPENAI_API_KEY is missing from the running container environment. Please check your docker run command mapping.")
+    else:
+        print(f"[NovaCrest Diagnostic] OPENAI_API_KEY detected (Length: {len(api_key)}, Starts with: {api_key[:8]}...)", file=sys.stderr)
 
-    model = ChatOpenAI(
+    model = ChatOpenAI( 
         model=model_name,
         temperature=temperature,
         top_p=top_p,
