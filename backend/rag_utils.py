@@ -25,7 +25,7 @@ def generate(query, retrieved_chunks, model) -> str:
       retrieved documentation.
     2. Do not use outside knowledge, assumptions, or information that is not
       present in the retrieved documentation.
-    3. Answer the user\'s specific question directly and completely.
+    3. Answer the user's specific question directly and completely.
     4. When the documentation provides configuration steps, setup instructions,
       procedures, or troubleshooting steps, present them clearly and in the
       correct order.
@@ -51,11 +51,11 @@ def rag(query: str, k: int = 2, model_name: str = "gpt-4o-mini", temperature: fl
     print("[NovaCrest Diagnostic] Active API Base:", api_base, file=sys.stderr)
     if not api_key:
         print("[NovaCrest Error] OPENAI_API_KEY environment variable is empty or missing inside the container!", file=sys.stderr)
-        raise ValueError("OPENAI_API_KEY is missing from the running container environment. Please check your docker run command mapping.")
+        raise ValueError("OPENAI_API_KEY is missing from the running container environment.")
     else:
-        print(f"[NovaCrest Diagnostic] OPENAI_API_KEY detected (Length: {len(api_key)}, Starts with: {api_key[:8]}...)", file=sys.stderr)
+        print("[NovaCrest Diagnostic] OPENAI_API_KEY environment variable is successfully configured.", file=sys.stderr)
 
-    model = ChatOpenAI( 
+    model = ChatOpenAI(
         model=model_name,
         temperature=temperature,
         top_p=top_p,
