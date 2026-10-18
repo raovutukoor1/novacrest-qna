@@ -1,0 +1,7 @@
+**/.env
+**/*.json
+**/configforcolab.txt
+**/configforcolab.txt.txt
+**/.git
+**/.github
+**/.gitignore
