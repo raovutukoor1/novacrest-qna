@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+import os
 
-BACKEND_URL = "http://localhost:7860"
+# Fallback to the backend service name on the shared Docker network
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:7860")
 
 st.set_page_config(page_title="NovaCrest", page_icon="🏨", layout="wide")
 
@@ -36,5 +38,5 @@ if st.button("Submit", type="primary"):
                             st.write(chunk)
             else:
                 st.error(f"Unable to get response. Status: {response.status_code}")
-        except Exception:
-            st.error("Unable to connect to the RAG API. Please verify the backend is running.")
+        except Exception as e:
+            st.error(f"Unable to connect to the RAG API at {BACKEND_URL}. Please verify your network and backend settings.")
