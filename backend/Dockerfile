@@ -14,4 +14,10 @@ HuggingFaceEmbeddings( \
 )"
 ENV TRANSFORMERS_OFFLINE=1
 ENV HF_HUB_OFFLINE=1
+
+# Explicitly reserve environment variables for execution
+ENV OPENAI_API_KEY=""
+ENV OPENAI_API_BASE="https://api.openai.com/v1"
+ENV OPENAI_BASE_URL="https://api.openai.com/v1"
+
 CMD ["gunicorn", "-w", "1", "--timeout", "120", "-b", "0.0.0.0:7860", "app:rag_api"]
