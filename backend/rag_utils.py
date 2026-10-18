@@ -42,13 +42,20 @@ def generate(query, retrieved_chunks, model) -> str:
     return model.invoke(prompt)
 
 def rag(query: str, k: int = 2, model_name: str = "gpt-4o-mini", temperature: float = 0.0, top_p: float = 1.0, max_tokens: int = 512, vectorstore=None):
+    # Support both conventional OpenAI endpoint names
+    api_base = os.getenv('OPENAI_API_BASE') or os.getenv('OPENAI_BASE_URL') or 'https://api.openai.com/v1'
+    api_key = os.getenv('OPENAI_API_KEY')
+
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is not set in the container environment.")
+
     model = ChatOpenAI(
         model=model_name,
         temperature=temperature,
         top_p=top_p,
         max_tokens=max_tokens,
-        openai_api_key=os.getenv('OPENAI_API_KEY'),
-        openai_api_base=os.getenv('OPENAI_API_BASE')
+        openai_api_key=api_key,
+        openai_api_base=api_base
     )
     retrieved_chunks = retrieve(query=query, k=k, vectorstore=vectorstore)
     answer = generate(query=query, retrieved_chunks=retrieved_chunks, model=model)
