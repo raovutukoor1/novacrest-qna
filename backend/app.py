@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from rag_utils import retrieve, rag
+import os
 
 EMBED_MODEL = "BAAI/bge-base-en-v1.5"
 VECTORSTORE_PATH = "faiss_index"
@@ -41,7 +42,7 @@ def answer_with_relevant_chunks():
     temperature = data.get("temperature", 0.0)
     top_p = data.get("top_p", 1.0)
     max_tokens = data.get("max_tokens", 512)
-    
+
     answer, chunks = rag(
         query=query, k=k, model_name=model_name,
         temperature=temperature, top_p=top_p, max_tokens=max_tokens,
@@ -62,7 +63,7 @@ def answer():
     temperature = data.get("temperature", 0.0)
     top_p = data.get("top_p", 1.0)
     max_tokens = data.get("max_tokens", 512)
-    
+
     generated_answer, _ = rag(
         query=query, k=k, model_name=model_name,
         temperature=temperature, top_p=top_p, max_tokens=max_tokens,
