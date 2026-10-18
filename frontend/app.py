@@ -4,6 +4,7 @@ import os
 
 # Fallback to the backend service name on the shared Docker network
 BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:7860")
+BACKEND_API_KEY = os.getenv("BACKEND_API_KEY")
 
 st.set_page_config(page_title="NovaCrest", page_icon="🏨", layout="wide")
 
@@ -24,9 +25,12 @@ if st.button("Submit", type="primary"):
     else:
         endpoint = "/v1/answer" if response_type == "Answer only" else "/v1/answer_with_relevant_chunks"
         payload = {"query": query, "k": k, "temperature": temperature, "max_tokens": max_tokens}
+        headers = {}
+        if BACKEND_API_KEY:
+            headers["X-API-Key"] = BACKEND_API_KEY
         try:
             with st.spinner("Thinking..."):
-                response = requests.post(f"{BACKEND_URL}{endpoint}", json=payload)
+                response = requests.post(f"{BACKEND_URL}{endpoint}", json=payload, headers=headers, timeout=30)
             if response.status_code == 200:
                 result = response.json()
                 st.subheader("Answer")
@@ -38,5 +42,5 @@ if st.button("Submit", type="primary"):
                             st.write(chunk)
             else:
                 st.error(f"Unable to get response. Status: {response.status_code}")
-        except Exception as e:
+        except Exception:
             st.error(f"Unable to connect to the RAG API at {BACKEND_URL}. Please verify your network and backend settings.")

@@ -1,0 +1,10 @@
+services:
+  backend:
+    network_mode: host
+    ports: !reset []
+
+  frontend:
+    network_mode: host
+    ports: !reset []
+    environment:
+      BACKEND_URL: http://127.0.0.1:7860

@@ -2,12 +2,14 @@ from langchain_openai import ChatOpenAI
 import os
 import sys
 
+
 def retrieve(query: str, k: int = 2, vectorstore=None) -> list[str]:
     results = vectorstore.similarity_search(query, k=k)
     return [
         f"Content:\n{r.page_content}\n\nMetadata:\n{r.metadata}"
         for r in results
     ]
+
 
 def generate(query, retrieved_chunks, model) -> str:
     prompt = f"""
@@ -42,24 +44,26 @@ def generate(query, retrieved_chunks, model) -> str:
     """
     return model.invoke(prompt)
 
+
 def rag(query: str, k: int = 2, model_name: str = "gpt-4o-mini", temperature: float = 0.0, top_p: float = 1.0, max_tokens: int = 512, vectorstore=None):
-    # Obtain variables with fallbacks
     api_base = os.getenv('OPENAI_API_BASE') or os.getenv('OPENAI_BASE_URL') or 'https://api.openai.com/v1'
     api_key = os.getenv('OPENAI_API_KEY')
 
-    # Secure Diagnostics
     print("[NovaCrest Diagnostic] Active API Base:", api_base, file=sys.stderr)
     if not api_key:
         print("[NovaCrest Error] OPENAI_API_KEY environment variable is empty or missing inside the container!", file=sys.stderr)
         raise ValueError("OPENAI_API_KEY is missing from the running container environment.")
-    else:
-        print("[NovaCrest Diagnostic] OPENAI_API_KEY environment variable is successfully configured.", file=sys.stderr)
+
+    safe_model_name = (model_name or "gpt-4o-mini").strip() or "gpt-4o-mini"
+    safe_temperature = max(0.0, min(float(temperature), 1.0))
+    safe_top_p = max(0.0, min(float(top_p), 1.0))
+    safe_max_tokens = max(1, min(int(max_tokens), 1024))
 
     model = ChatOpenAI(
-        model=model_name,
-        temperature=temperature,
-        top_p=top_p,
-        max_tokens=max_tokens,
+        model=safe_model_name,
+        temperature=safe_temperature,
+        top_p=safe_top_p,
+        max_tokens=safe_max_tokens,
         openai_api_key=api_key,
         openai_api_base=api_base
     )
